@@ -1,3 +1,12 @@
+This is my Phase-wise Documentation Link:
+https://drive.google.com/drive/folders/1Ky0Hb5_MYCea7mhGwRfvfvGEwl7reKWD?usp=sharing
+
+This is my Project Documentation Link:
+https://drive.google.com/drive/folders/1wreAnGQrvXaJAoykxcSageULnSfwCskf?usp=sharing
+
+This is my Project Demo Video Link:
+https://drive.google.com/file/d/10IVGn6loqdwTVybIRXRlnwGTotj-s-v8/view?usp=sharing
+
 # 🛍️ ShopEZ - Premium MERN E-Commerce Platform
 
 ShopEZ is a full-stack, enterprise-grade e-commerce application built with the MERN stack (MongoDB, Express, React, Node.js). It features a modern, high-conversion UI inspired by top-tier platforms, complete with secure authentication, cart management, and a dedicated Dark Theme Admin Dashboard.
