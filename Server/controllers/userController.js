@@ -50,22 +50,31 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        console.log("Email entered:", email);
+
         const user = await User.findOne({ email });
+
+        console.log("User found:", user);
+
+        if (user) {
+            const match = await bcrypt.compare(password, user.password);
+            console.log("Password match:", match);
+        }
 
         if (user && (await bcrypt.compare(password, user.password))) {
             res.json({
                 _id: user.id,
                 username: user.username,
                 email: user.email,
-                isAdmin: user.isAdmin, // Crucial: Informing React this is an Admin!
+                isAdmin: user.isAdmin,
                 token: generateToken(user._id)
             });
         } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+            res.status(401).json({ message: "Invalid email or password" });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
 module.exports = { registerUser, loginUser };

@@ -47,10 +47,64 @@ const createProduct = async (req, res) => {
         });
 
         const createdProduct = await product.save();
+
         res.status(201).json(createdProduct);
+
     } catch (error) {
-        res.status(500).json({ message: 'Server Error: Could not create product', error: error.message });
+        console.error(error);
+
+        res.status(500).json({
+            message: 'Server Error: Could not create product',
+            error: error.message
+        });
     }
 };
 
-module.exports = { getProducts, getProductById, createProduct };
+// @desc    Update a product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+const updateProduct = async (req, res) => {
+
+    console.log("========== UPDATE API HIT ==========");
+    console.log("Product ID:", req.params.id);
+    console.log("Request Body:", req.body);
+
+    try {
+
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            console.log("Product not found");
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        product.title = req.body.title;
+        product.description = req.body.description;
+        product.price = req.body.price;
+        product.discount = req.body.discount;
+        product.category = req.body.category;
+        product.image = req.body.image;
+        product.stock = req.body.stock;
+
+        const updatedProduct = await product.save();
+
+        console.log("Product Updated Successfully");
+
+        res.json(updatedProduct);
+
+    } catch (error) {
+
+        console.error("UPDATE ERROR:", error);
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+module.exports = {
+    getProducts,
+    getProductById,
+    createProduct,
+    updateProduct
+};

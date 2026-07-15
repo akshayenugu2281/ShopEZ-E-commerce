@@ -31,13 +31,6 @@ app.get('/', (req, res) => {
 // Database Connection & Server Start
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('Successfully connected to MongoDB!');
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error('Database connection failed:', error.message);
-    });
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

@@ -6,8 +6,18 @@ const AdminDashboard = () => {
   const { token, products, fetchProducts, API_URL } = useContext(ShopContext);
   const [activeTab, setActiveTab] = useState('summary'); // summary | products | orders | new
   const [orders, setOrders] = useState([]);
-  const [formData, setFormData] = useState({ title: '', description: '', price: '', discount: '0', category: 'Electronics', image: '', stock: '' });
+  const emptyForm = {
+  title: '',
+  description: '',
+  price: '',
+  discount: '0',
+  category: 'Electronics',
+  image: '',
+  stock: ''
+};
 
+const [formData, setFormData] = useState(emptyForm);
+const [editingProduct, setEditingProduct] = useState(null);
   // Fetch all orders on load
   useEffect(() => {
     const fetchOrders = async () => {
@@ -30,6 +40,55 @@ const AdminDashboard = () => {
       setActiveTab('products');
     } catch (err) { alert(err.message); }
   };
+
+  const handleEdit = (product) => {
+  setEditingProduct(product);
+
+  setFormData({
+    title: product.title,
+    description: product.description,
+    price: product.price,
+    discount: product.discount,
+    category: product.category,
+    image: product.image,
+    stock: product.stock
+  });
+
+  setActiveTab("new");
+};
+
+const handleUpdate = async (e) => {
+  e.preventDefault();
+
+  try {
+    await axios.put(
+      `${API_URL}/products/${editingProduct._id}`,
+      {
+        ...formData,
+        price: Number(formData.price),
+        discount: Number(formData.discount),
+        stock: Number(formData.stock)
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    alert("Product Updated Successfully!");
+
+    fetchProducts();
+
+    setEditingProduct(null);
+    setFormData(emptyForm);
+    setActiveTab("products");
+
+  } catch (err) {
+    console.error(err);
+    alert("Update Failed");
+  }
+};
 
   // Nav Button Styling
   const navStyle = (tab) => ({
@@ -79,8 +138,22 @@ const AdminDashboard = () => {
                     <span style={{ fontWeight: '800' }}>${product.price}</span>
                     <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>Stock: {product.stock}</span>
                   </div>
-                  <button style={{ width: '100%', padding: '8px', border: '1px solid var(--admin-accent)', color: 'var(--admin-accent)', backgroundColor: 'transparent', borderRadius: '4px', fontWeight: '600' }}>Update Entry</button>
-                </div>
+                  <button
+        onClick={() => handleEdit(product)}
+        style={{
+          width: '100%',
+          padding: '8px',
+          border: '1px solid var(--admin-accent)',
+          color: 'var(--admin-accent)',
+          backgroundColor: 'transparent',
+          borderRadius: '4px',
+          fontWeight: '600',
+          cursor: 'pointer'
+        }}
+      >
+        Update Entry
+      </button>
+                      </div>
               ))}
             </div>
           </div>
@@ -88,8 +161,18 @@ const AdminDashboard = () => {
 
         {/* 3. New Product Form (Dark Theme) */}
         {activeTab === 'new' && (
-          <form onSubmit={handleSubmit} style={{ backgroundColor: 'var(--admin-surface)', padding: '40px', borderRadius: '8px', maxWidth: '700px', margin: '0 auto', border: '1px solid #374151' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '32px', textAlign: 'center' }}>Ingest New Product</h2>
+          <form
+  onSubmit={editingProduct ? handleUpdate : handleSubmit}
+  style={{
+    backgroundColor: 'var(--admin-surface)',
+    padding: '40px',
+    borderRadius: '8px',
+    maxWidth: '700px',
+    margin: '0 auto',
+    border: '1px solid #374151'
+  }}
+>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '32px', textAlign: 'center' }}>{editingProduct ? "Update Product" : "Ingest New Product"}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <input type="text" placeholder="Product Name" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} style={{ gridColumn: 'span 2', padding: '14px', backgroundColor: '#374151', border: 'none', color: '#fff', borderRadius: '4px', outline: 'none' }} />
               <input type="number" placeholder="Price ($)" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} style={{ padding: '14px', backgroundColor: '#374151', border: 'none', color: '#fff', borderRadius: '4px', outline: 'none' }} />
@@ -104,7 +187,43 @@ const AdminDashboard = () => {
               </select>
               <textarea placeholder="Product Description" required rows="4" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ gridColumn: 'span 2', padding: '14px', backgroundColor: '#374151', border: 'none', color: '#fff', borderRadius: '4px', outline: 'none' }}></textarea>
             </div>
-            <button type="submit" style={{ width: '100%', padding: '16px', backgroundColor: '#2563eb', color: '#fff', borderRadius: '4px', fontWeight: '700', marginTop: '32px' }}>Add Product</button>
+            <button
+  type="submit"
+  style={{
+    width: '100%',
+    padding: '16px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    borderRadius: '4px',
+    fontWeight: '700',
+    marginTop: '32px'
+  }}
+>
+  {editingProduct ? "Update Product" : "Add Product"}
+</button>
+        {editingProduct && (
+  <button
+    type="button"
+    onClick={() => {
+      setEditingProduct(null);
+      setFormData(emptyForm);
+      setActiveTab("products");
+    }}
+    style={{
+      width: '100%',
+      padding: '16px',
+      backgroundColor: '#ef4444',
+      color: '#fff',
+      borderRadius: '4px',
+      fontWeight: '700',
+      marginTop: '12px',
+      border: 'none',
+      cursor: 'pointer'
+    }}
+  >
+    Cancel
+  </button>
+)}
           </form>
         )}
 
